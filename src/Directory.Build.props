@@ -1,0 +1,119 @@
+<Project>
+
+  <!-- Common Locations -->
+  <PropertyGroup>
+    <ImgDirectory>$(MSBuildThisFileDirectory)..\img\</ImgDirectory>
+    <LangDirectory>$(MSBuildThisFileDirectory)lang\</LangDirectory>
+    <SrcDirectory>$(MSBuildThisFileDirectory)</SrcDirectory>
+  </PropertyGroup>
+
+  <!-- Common Assembly and Build Properties -->
+  <PropertyGroup>
+    <Copyright>Copyright © 2023 William Sugarman.</Copyright>
+    <Deterministic>true</Deterministic>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <LangVersion>latest</LangVersion>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <Nullable>enable</Nullable>
+    <Product>Ghostlogger</Product>
+    <RunSettingsFilePath>$(SrcDirectory)CodeCoverage.runsettings</RunSettingsFilePath>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <!-- Dynamic Assembly Info -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.CLSCompliantAttribute ">
+      <_Parameter1>true</_Parameter1>
+      <_Parameter1_TypeName>System.Boolean</_Parameter1_TypeName>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Resources.NeutralResourcesLanguage ">
+      <_Parameter1>en</_Parameter1>
+      <_Parameter1_TypeName>System.String</_Parameter1_TypeName>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <!-- Code Analyzers -->
+  <PropertyGroup>
+    <AnalysisLevel>latest-All</AnalysisLevel>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <!-- Support for new .NET/C# Features in .NET Standard 2.0 -->
+  <ItemGroup>
+    <Compile Include="$(LangDirectory)*" Visible="false" />
+  </ItemGroup>
+
+  <!-- Tools -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- Below are items and properties that vary between projects -->
+  <!-- Common framework and tooling PackageReference elements are also kept in sync here -->
+  <Choose>
+    <When Condition="$(MSBuildProjectName.EndsWith('.Test'))">
+
+      <!-- Unit Test Properties -->
+      <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <!-- CA1062: Validate arguments of public methods -->
+        <!-- CA1707: Identifiers should not contain underscores -->
+        <NoWarn>$(NoWarn);CA1062;CA1707</NoWarn>
+        <TargetFrameworks>net7.0</TargetFrameworks>
+      </PropertyGroup>
+
+      <!-- Test Framework Packages -->
+      <ItemGroup>
+        <PackageReference Include="coverlet.collector" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" PrivateAssets="All" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
+      </ItemGroup>
+
+    </When>
+    <Otherwise>
+
+      <!-- Assembly, Build, and Packing Properties -->
+      <PropertyGroup>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IncludeSymbols>true</IncludeSymbols>
+        <!-- NU5105: Package version contains components that may not be supported on NuGet clients older than v4.3 -->
+        <NoWarn>$(NoWarn);NU5105</NoWarn>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <SkipDefaultEditorConfigAsAdditionalFile>true</SkipDefaultEditorConfigAsAdditionalFile>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <TargetFrameworks>netstandard2.0</TargetFrameworks>
+      </PropertyGroup>
+
+      <!-- NuGet metadata -->
+      <PropertyGroup>
+        <Authors>William Sugarman</Authors>
+        <PackageIcon>Ghost.png</PackageIcon>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReleaseNotes>https://github.com/wsugarman/ghostlogger/releases/tag/$(PackageVersion)</PackageReleaseNotes>
+        <MinClientVersion>4.9.0</MinClientVersion>
+      </PropertyGroup>
+
+      <!-- Resource Files -->
+      <ItemGroup>
+        <None Include="$(MSBuildProjectDirectory)\README.md" Pack="true" PackagePath="\" />
+        <None Include="$(ImgDirectory)Ghost.png" Pack="true" PackagePath="\" Visible="false" />
+      </ItemGroup>
+
+      <!-- Dynamic Assembly Info -->
+      <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+          <_Parameter1>$(MSBuildProjectName).Test</_Parameter1>
+          <_Parameter1_TypeName>System.String</_Parameter1_TypeName>
+        </AssemblyAttribute>
+      </ItemGroup>
+
+    </Otherwise>
+  </Choose>
+
+</Project>
