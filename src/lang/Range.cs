@@ -1,12 +1,10 @@
-﻿// Copyright © Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the repo root for license information.
+// Copyright © William Sugarman.
+// Licensed under the MIT License.
 
 // This file defines the Range class used to represent a sequence subset (E.g. a[2..4])
 //
 // Documentation: https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/ranges-indexes
-// Source: https://github.com/dotnet/runtime/blob/v6.0.0/src/libraries/System.Private.CoreLib/src/System/Range.cs
-
-#if NETSTANDARD2_0
+// Source: https://github.com/dotnet/runtime/blob/v7.0.0/src/libraries/System.Private.CoreLib/src/System/Range.cs
 
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -75,5 +73,3 @@ internal readonly struct Range : IEquatable<Range>
         return ((int)rol5 + h1) ^ h2;
     }
 }
-
-#endif

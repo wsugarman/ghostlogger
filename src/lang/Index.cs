@@ -1,12 +1,10 @@
-﻿// Copyright © Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the repo root for license information.
+// Copyright © William Sugarman.
+// Licensed under the MIT License.
 
 // This file defines the Index class used to implement indicies (E.g. a[^1]).
 //
 // Documentation: https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/ranges-indexes
-// Source: https://github.com/dotnet/runtime/blob/v6.0.0/src/libraries/System.Private.CoreLib/src/System/Index.cs
-
-#if NETSTANDARD2_0
+// Source: https://github.com/dotnet/runtime/blob/v7.0.0/src/libraries/System.Private.CoreLib/src/System/Index.cs
 
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -80,5 +78,3 @@ internal readonly struct Index : IEquatable<Index>
     private string ToStringFromEnd()
        => '^' + Value.ToString(CultureInfo.InvariantCulture);
 }
-
-#endif

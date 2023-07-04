@@ -1,5 +1,5 @@
-// Copyright © Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the repo root for license information.
+// Copyright © William Sugarman.
+// Licensed under the MIT License.
 
 // This file defines the attributes used to describe an API within a nullable context. While these types are defined
 // for more recent target frameworks, they are not available for .NET Standard 2.0 libraries by default. The attributes
@@ -7,9 +7,7 @@
 // repository on GitHub.
 //
 // Documentation: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/attributes/nullable-analysis
-// Source: https://github.com/dotnet/runtime/blob/v6.0.0/src/libraries/System.Private.CoreLib/src/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
-
-#if NETSTANDARD2_0
+// Source: https://github.com/dotnet/runtime/blob/v7.0.0/src/libraries/System.Private.CoreLib/src/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
 
 namespace System.Diagnostics.CodeAnalysis;
 
@@ -112,5 +110,3 @@ internal sealed class MemberNotNullWhenAttribute : Attribute
         Members = members;
     }
 }
-
-#endif

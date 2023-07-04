@@ -42,7 +42,7 @@
   </PropertyGroup>
 
   <!-- Support for new .NET/C# Features in .NET Standard 2.0 -->
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <Compile Include="$(LangDirectory)*" Visible="false" />
   </ItemGroup>
 
