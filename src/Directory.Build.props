@@ -5,7 +5,8 @@
     <ImgDirectory>$(MSBuildThisFileDirectory)..\img\</ImgDirectory>
     <LangDirectory>$(MSBuildThisFileDirectory)lang\</LangDirectory>
     <SrcDirectory>$(MSBuildThisFileDirectory)</SrcDirectory>
-  </PropertyGroup>
+    <TaskDirectory>$(MSBuildThisFileDirectory)task\</TaskDirectory>
+</PropertyGroup>
 
   <!-- Common Assembly and Build Properties -->
   <PropertyGroup>
