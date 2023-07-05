@@ -12,6 +12,7 @@
     <Copyright>Copyright © 2023 William Sugarman.</Copyright>
     <Deterministic>true</Deterministic>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <ImplicitUsings>false</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <Nullable>enable</Nullable>

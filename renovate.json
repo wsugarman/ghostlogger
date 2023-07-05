@@ -14,6 +14,12 @@
   ],
   "packageRules": [
     {
+      "groupName": "MSBuild",
+      "matchPackagePrefixes": [
+        "Microsoft.Build."
+      ]
+    },
+    {
       "groupName": "XUnit",
       "matchPackagePrefixes": [
         "xunit."
