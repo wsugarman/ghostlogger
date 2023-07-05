@@ -5,6 +5,7 @@
     <ImgDirectory>$(MSBuildThisFileDirectory)..\img\</ImgDirectory>
     <LangDirectory>$(MSBuildThisFileDirectory)lang\</LangDirectory>
     <SrcDirectory>$(MSBuildThisFileDirectory)</SrcDirectory>
+    <TaskDirectory>$(MSBuildThisFileDirectory)task\</TaskDirectory>
   </PropertyGroup>
 
   <!-- Common Assembly and Build Properties -->
@@ -12,6 +13,7 @@
     <Copyright>Copyright © 2023 William Sugarman.</Copyright>
     <Deterministic>true</Deterministic>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <ImplicitUsings>false</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <Nullable>enable</Nullable>
