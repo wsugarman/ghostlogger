@@ -1,0 +1,46 @@
+name: Ghostlogger PR
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Test
+        uses: ./.github/actions/dotnet-test
+        with:
+          buildConfiguration: Debug
+          versionSuffix: pr.${{ github.event.pull_request.number }}
+          resultsDirectory: ${{ runner.temp }}/TestResults/
+
+  package:
+    name: Package
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Package
+        uses: ./.github/actions/dotnet-pack
+        with:
+          buildConfiguration: Release
+          versionSuffix: pr.${{ github.event.pull_request.number }}
+          sign: 'true'
+          azureTenantId: ${{ secrets.AZURE_TENANT_ID }}
+          azureClientId: ${{ secrets.AZURE_CLIENT_ID }}
+          azureClientSecret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          azureSubscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azureKeyVaultName: ${{ secrets.AZURE_KEYVAULT_NAME }}
+          azureCodeSigningAccountName: ${{ secrets.AZURE_CODESIGNING_NAME }}
+          strongNameKeySecretName: ${{ secrets.AZURE_KEYVAULT_SECRET_SNK }}
+          certificateProfileName: ${{ secrets.AZURE_CODESIGNING_PROFILE_NAME }}

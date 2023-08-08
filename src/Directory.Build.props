@@ -4,12 +4,13 @@
   <PropertyGroup>
     <ImgDirectory>$(MSBuildThisFileDirectory)..\img\</ImgDirectory>
     <LangDirectory>$(MSBuildThisFileDirectory)lang\</LangDirectory>
+    <SnkDirectory>$(MSBuildThisFileDirectory)snk\</SnkDirectory>
     <SrcDirectory>$(MSBuildThisFileDirectory)</SrcDirectory>
-    <TaskDirectory>$(MSBuildThisFileDirectory)task\</TaskDirectory>
   </PropertyGroup>
 
   <!-- Common Assembly and Build Properties -->
   <PropertyGroup>
+    <AssemblyOriginatorKeyFile>$(SnkDirectory)Public.snk</AssemblyOriginatorKeyFile>
     <Copyright>Copyright © 2023 William Sugarman.</Copyright>
     <Deterministic>true</Deterministic>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -19,6 +20,7 @@
     <Nullable>enable</Nullable>
     <Product>Ghostlogger</Product>
     <RunSettingsFilePath>$(SrcDirectory)CodeCoverage.runsettings</RunSettingsFilePath>
+    <SignAssembly>true</SignAssembly>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
@@ -64,6 +66,7 @@
         <!-- CA1062: Validate arguments of public methods -->
         <!-- CA1707: Identifiers should not contain underscores -->
         <NoWarn>$(NoWarn);CA1062;CA1707</NoWarn>
+        <PublicSign>true</PublicSign>
         <TargetFrameworks>net7.0</TargetFrameworks>
       </PropertyGroup>
 
@@ -80,6 +83,7 @@
 
       <!-- Assembly, Build, and Packing Properties -->
       <PropertyGroup>
+        <DelaySign>true</DelaySign>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeSymbols>true</IncludeSymbols>
@@ -110,7 +114,7 @@
       <!-- Dynamic Assembly Info -->
       <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-          <_Parameter1>$(MSBuildProjectName).Test</_Parameter1>
+          <_Parameter1>$(MSBuildProjectName).Test, PublicKey=002400000c800000940000000602000000240000525341310004000001000100f5f6f0637271efc372c73bb82b26b1a024182e87d2a43213be7d267537c1c9960f2e43479b34fcf8e54d3646a40c6be4855528622f5294493311e3522f91db5233f2f455a93728f3051dd4c114044225aff39caded75d9ac7dceb0a160123d672346b034a04a7d4febc06ca4de8e4547e4e6cb056becd546ffde37ebafc8a9b4</_Parameter1>
           <_Parameter1_TypeName>System.String</_Parameter1_TypeName>
         </AssemblyAttribute>
       </ItemGroup>

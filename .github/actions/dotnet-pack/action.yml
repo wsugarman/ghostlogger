@@ -1,0 +1,137 @@
+name: dotnet pack
+description: Packs the Ghostlogger MSBuild task NuGet package
+inputs:
+  buildConfiguration:
+    default: Release
+    description: The dotnet build configuration
+    required: false
+  versionSuffix:
+    default: ''
+    description: The optional assembly and NuGet version suffix
+    required: false
+  sign:
+    default: 'false'
+    description: Indicates whether the assemblies should be both code signed and signed with a strong name.
+    required: false
+  azureTenantId:
+    default: ''
+    description: The Azure tenant ID for service principal used to access the Azure Key Vault and Azure Code Signing Service.
+    required: false
+  azureClientId:
+    default: ''
+    description: The client ID for the service principal used to access the Azure Key Vault and Azure Code Signing Service.
+    required: false
+  azureClientSecret:
+    default: ''
+    description: The client secret for the service principal used to access the Azure Key Vault and Azure Code Signing Service.
+    required: false
+  azureSubscriptionId:
+    default: ''
+    description: The Azure subscription ID containing both the Azure Key Vault and Azure Code Signing Service.
+    required: false
+  strongNameExe:
+    default: 'C:/Program Files (x86)/Microsoft SDKs/Windows/v10.0A/bin/NETFX 4.8 Tools/sn.exe'
+    description: The path to the sn.exe tool used to sign the assemblies with a strong name. Requires a Windows runner.
+    required: false
+  azureKeyVaultName:
+    default: ''
+    description: The name of the Azure Key Vault containing the Ghostlogger strong name key.
+    required: false
+  azureCodeSigningAccountName:
+    default: ''
+    description: The name of the Azure Code Signing account containing the Ghostlogger certificate profile.
+    required: false
+  strongNameKeySecretName:
+    default: ''
+    description: The name of the secret for the Ghostlogger strong name key.
+    required: false
+  certificateProfileName:
+    default: ''
+    description: The name of the certificate profile within the Azure Code Signing Service.
+  codeSigningUri:
+    default: 'https://wus.codesigning.azure.net/'
+    description: The URI of the Azure Code Signing Service.
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      uses: actions/setup-dotnet@v2
+
+    - name: Az CLI login
+      uses: azure/login@v1
+      if: ${{ inputs.sign == 'true' }}
+      with:
+        creds: '{"clientId":"${{ inputs.azureClientId }}","clientSecret":"${{ inputs.azureClientSecret }}","subscriptionId":"${{ inputs.azureSubscriptionId }}","tenantId":"${{ inputs.azureTenantId }}"}'
+
+    - name: Fetch Strong Name Key Secret
+      id: akv
+      uses: azure/CLI@v1
+      if: ${{ inputs.sign == 'true' }}
+      with:
+        azcliversion: latest
+        inlineScript: |
+          key=$(az keyvault secret show -n "${{ inputs.strongNameKeySecretName }}" --vault-name "${{ inputs.azureKeyVaultName }}" --query value -o tsv)
+          echo "snk=$key" >> "$GITHUB_OUTPUT"
+
+    - name: Create .snk File
+      shell: bash
+      if: ${{ inputs.sign == 'true' }}
+      run: |
+        echo $STRONG_NAME_KEY_BASE64 | base64 --decode > "${{ runner.temp }}/snk/Private.snk"
+      env:
+        STRONG_NAME_KEY_BASE64: ${{ steps.akv.outputs.snk }}
+
+    - name: Build
+      shell: bash
+      run: |
+        dotnet build "./src/task/Ghostlogger/Ghostlogger.csproj" \
+          -c "${{ inputs.buildConfiguration }}" \
+          "-p:ContinuousIntegrationBuild=true;VersionSuffix=${{ inputs.versionSuffix }}" \
+          -warnaserror \
+          -o "${{ runner.temp }}/build"
+
+    - name: Sign with Enhanced Strong Name
+      shell: bash
+      if: ${{ inputs.sign == 'true' }}
+      run: |
+        "${{ inputs.strongNameExe }}" -Ra "${{ runner.temp }}/build/Ghostlogger.dll" "${{ runner.temp }}/snk/Private.snk"
+
+    - name: Code Sign Assembly
+      uses: azure/azure-code-signing-action@v0.2.15
+      if: ${{ inputs.sign == 'true' }}
+      with:
+        azure-tenant-id: ${{ inputs.azureTenantId }}
+        azure-client-id: ${{ inputs.azureClientId }}
+        azure-client-secret: ${{ inputs.azureClientSecret }}
+        endpoint: ${{ inputs.codeSigningUri }}
+        code-signing-account-name: ${{ inputs.azureCodeSigningAccountName }}
+        certificate-profile-name: ${{ inputs.certificateProfileName }}
+        files-folder: "${{ runner.temp }}/build"
+        files-folder-filter: Ghostlogger.dll
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+
+    # TODO: Pack, sign, and upload NuGet package instead
+    - name: Upload Assembly
+      uses: actions/upload-artifact@v3
+      with:
+        name: Package
+        path: ${{ runner.temp }}/build
+
+    - name: Delete .snk File
+      shell: bash
+      if: ${{ inputs.sign == 'true' && always() }}
+      run: |
+        rm "${{ runner.temp }}/snk/Private.snk"
+
+    - name: Azure CLI script
+      uses: azure/CLI@v1
+      if: ${{ inputs.sign == 'true' && always() }}
+      with:
+        inlineScript: |
+          az logout
+          az cache purge
+          az account clear
