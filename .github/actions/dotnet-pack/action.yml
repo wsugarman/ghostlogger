@@ -71,6 +71,7 @@ runs:
       if: ${{ inputs.sign == 'true' && success() }}
       run: |
         key=$(az keyvault secret show -n "${{ inputs.strongNameKeySecretName }}" --vault-name "${{ inputs.azureKeyVaultName }}" --query value -o tsv)
+        echo "::add-mask::$key"
         echo "snk=$key" >> "$GITHUB_OUTPUT"
 
     - name: Create .snk File
