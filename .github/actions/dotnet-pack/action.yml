@@ -78,7 +78,7 @@ runs:
       shell: bash
       if: ${{ inputs.sign == 'true' && success() }}
       run: |
-        mkdir -p ""${{ runner.temp }}/snk/"
+        mkdir -p "${{ runner.temp }}/snk/"
         echo $STRONG_NAME_KEY_BASE64 | base64 --decode > "${{ runner.temp }}/snk/Private.snk"
       env:
         STRONG_NAME_KEY_BASE64: ${{ steps.akv.outputs.snk }}
