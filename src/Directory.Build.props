@@ -101,7 +101,6 @@
         <Authors>William Sugarman</Authors>
         <PackageIcon>Ghost.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReleaseNotes>https://github.com/wsugarman/ghostlogger/releases/tag/$(PackageVersion)</PackageReleaseNotes>
         <MinClientVersion>4.9.0</MinClientVersion>
       </PropertyGroup>
 

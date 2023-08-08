@@ -1,0 +1,7 @@
+<Project>
+
+  <PropertyGroup Condition="!$(MSBuildProjectName.EndsWith('.Test'))">
+    <PackageReleaseNotes>https://github.com/wsugarman/ghostlogger/releases/tag/$(PackageVersion)</PackageReleaseNotes>
+  </PropertyGroup>
+
+</Project>

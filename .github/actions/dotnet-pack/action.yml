@@ -56,8 +56,14 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Setup
+    - name: Setup Dotnet
       uses: actions/setup-dotnet@v2
+
+    - name: Setup .NET 6 Dotnet
+      uses: actions/setup-dotnet@v3
+      if: ${{ inputs.sign == 'true' && success() }}
+      with:
+       dotnet-version: 6.x
 
     - name: az login
       uses: azure/login@v1
@@ -89,14 +95,13 @@ runs:
         dotnet build "./src/task/Ghostlogger/Ghostlogger.csproj" \
           -c "${{ inputs.buildConfiguration }}" \
           "-p:ContinuousIntegrationBuild=true;VersionSuffix=${{ inputs.versionSuffix }}" \
-          -warnaserror \
-          -o "${{ runner.temp }}/build"
+          -warnaserror
 
     - name: Sign with Enhanced Strong Name
       shell: bash
       if: ${{ inputs.sign == 'true' && success() }}
       run: |
-        "${{ inputs.strongNameExe }}" -Ra "${{ runner.temp }}/build/Ghostlogger.dll" "${{ runner.temp }}/snk/Private.snk"
+        "${{ inputs.strongNameExe }}" -Ra "./src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0/Ghostlogger.dll" "${{ runner.temp }}/snk/Private.snk"
 
     - name: Code Sign Assembly
       uses: azure/azure-code-signing-action@v0.2.15
@@ -114,12 +119,21 @@ runs:
         timestamp-rfc3161: http://timestamp.acs.microsoft.com
         timestamp-digest: SHA256
 
-    # TODO: Pack, sign, and upload NuGet package instead
-    - name: Upload Assembly
+    # TODO: Sign and push package
+    - name: Pack
+      shell: bash
+      run: |
+        dotnet pack "./src/task/Ghostlogger/Ghostlogger.csproj" \
+          -c "${{ inputs.buildConfiguration }}" \
+          "-p:ContinuousIntegrationBuild=true;VersionSuffix=${{ inputs.versionSuffix }}" \
+          --no-build \
+          -o "${{ runner.temp }}/package"
+
+    - name: Upload NuGet Package
       uses: actions/upload-artifact@v3
       with:
         name: Package
-        path: ${{ runner.temp }}/build
+        path: ${{ runner.temp }}/package
 
     - name: Delete .snk File
       shell: bash
