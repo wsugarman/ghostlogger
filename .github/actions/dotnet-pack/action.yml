@@ -59,25 +59,23 @@ runs:
     - name: Setup
       uses: actions/setup-dotnet@v2
 
-    - name: Az CLI login
+    - name: az login
       uses: azure/login@v1
-      if: ${{ inputs.sign == 'true' }}
+      if: ${{ inputs.sign == 'true' && success() }}
       with:
         creds: '{"clientId":"${{ inputs.azureClientId }}","clientSecret":"${{ inputs.azureClientSecret }}","subscriptionId":"${{ inputs.azureSubscriptionId }}","tenantId":"${{ inputs.azureTenantId }}"}'
 
     - name: Fetch Strong Name Key Secret
       id: akv
-      uses: azure/CLI@v1
-      if: ${{ inputs.sign == 'true' }}
-      with:
-        azcliversion: latest
-        inlineScript: |
-          key=$(az keyvault secret show -n "${{ inputs.strongNameKeySecretName }}" --vault-name "${{ inputs.azureKeyVaultName }}" --query value -o tsv)
-          echo "snk=$key" >> "$GITHUB_OUTPUT"
+      shell: bash
+      if: ${{ inputs.sign == 'true' && success() }}
+      run: |
+        key=$(az keyvault secret show -n "${{ inputs.strongNameKeySecretName }}" --vault-name "${{ inputs.azureKeyVaultName }}" --query value -o tsv)
+        echo "snk=$key" >> "$GITHUB_OUTPUT"
 
     - name: Create .snk File
       shell: bash
-      if: ${{ inputs.sign == 'true' }}
+      if: ${{ inputs.sign == 'true' && success() }}
       run: |
         echo $STRONG_NAME_KEY_BASE64 | base64 --decode > "${{ runner.temp }}/snk/Private.snk"
       env:
@@ -94,13 +92,13 @@ runs:
 
     - name: Sign with Enhanced Strong Name
       shell: bash
-      if: ${{ inputs.sign == 'true' }}
+      if: ${{ inputs.sign == 'true' && success() }}
       run: |
         "${{ inputs.strongNameExe }}" -Ra "${{ runner.temp }}/build/Ghostlogger.dll" "${{ runner.temp }}/snk/Private.snk"
 
     - name: Code Sign Assembly
       uses: azure/azure-code-signing-action@v0.2.15
-      if: ${{ inputs.sign == 'true' }}
+      if: ${{ inputs.sign == 'true' && success() }}
       with:
         azure-tenant-id: ${{ inputs.azureTenantId }}
         azure-client-id: ${{ inputs.azureClientId }}
@@ -127,11 +125,10 @@ runs:
       run: |
         rm "${{ runner.temp }}/snk/Private.snk"
 
-    - name: Azure CLI script
-      uses: azure/CLI@v1
+    - name: az logout
+      shell: bash
       if: ${{ inputs.sign == 'true' && always() }}
-      with:
-        inlineScript: |
-          az logout
-          az cache purge
-          az account clear
+      run: |
+        az logout
+        az cache purge
+        az account clear

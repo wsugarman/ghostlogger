@@ -34,7 +34,8 @@ jobs:
       uses: actions/setup-dotnet@v3
 
     - name: Build
-      run: dotnet build ./src/task/Ghostlogger.sln -c Release -p:ContinuousIntegrationBuild=true -warnaserror
+      run: |
+        dotnet build ./src/Ghostlogger.sln -c Release -p:ContinuousIntegrationBuild=true -warnaserror
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
