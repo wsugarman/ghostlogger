@@ -59,12 +59,6 @@ runs:
     - name: Setup Dotnet
       uses: actions/setup-dotnet@v2
 
-    - name: Setup .NET 6 Dotnet
-      uses: actions/setup-dotnet@v3
-      if: ${{ inputs.sign == 'true' && success() }}
-      with:
-       dotnet-version: 6.x
-
     - name: az login
       uses: azure/login@v1
       if: ${{ inputs.sign == 'true' && success() }}
