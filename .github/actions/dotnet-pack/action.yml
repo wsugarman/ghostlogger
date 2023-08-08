@@ -109,7 +109,7 @@ runs:
         code-signing-account-name: ${{ inputs.azureCodeSigningAccountName }}
         certificate-profile-name: ${{ inputs.certificateProfileName }}
         files-folder: "${{ runner.temp }}/build"
-        files-folder-filter: Ghostlogger.dll
+        files-folder-filter: dll
         file-digest: SHA256
         timestamp-rfc3161: http://timestamp.acs.microsoft.com
         timestamp-digest: SHA256
