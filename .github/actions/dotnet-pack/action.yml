@@ -125,7 +125,7 @@ runs:
       shell: bash
       if: ${{ inputs.sign == 'true' && always() }}
       run: |
-        rm "${{ runner.temp }}/snk/Private.snk"
+        rm -f "${{ runner.temp }}/snk/Private.snk"
 
     - name: az logout
       shell: bash
