@@ -61,7 +61,7 @@ runs:
   using: composite
   steps:
     - name: Setup Dotnet
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v3
 
     - name: az login
       uses: azure/login@v1
