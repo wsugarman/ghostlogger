@@ -116,7 +116,7 @@ runs:
         dotnet build-server shutdown
 
     - name: Code Sign Assembly
-      uses: azure/azure-code-signing-action@v0.2.15
+      uses: azure/azure-code-signing-action@v0.2.20
       if: ${{ inputs.sign == 'true' && success() }}
       with:
         azure-tenant-id: ${{ inputs.azureTenantId }}
