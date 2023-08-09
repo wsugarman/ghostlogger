@@ -60,8 +60,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Setup Dotnet
+    - name: Install .NET SDK
       uses: actions/setup-dotnet@v3
+      with:
+        global-json-file: 'global.json'
+        dotnet-version: '6.x'
 
     - name: az login
       uses: azure/login@v1
