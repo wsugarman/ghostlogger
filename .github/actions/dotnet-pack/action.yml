@@ -106,7 +106,7 @@ runs:
       shell: pwsh
       if: ${{ inputs.sign == 'true' && success() }}
       run: |
-        $assembly = [System.Reflection.Assembly]::LoadFile('./src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0/Ghostlogger.dll')
+        $assembly = [System.Reflection.Assembly]::LoadFile('${{ github.workspace }}/src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0/Ghostlogger.dll')
         $description = $assembly.GetCustomAttributes([System.Reflection.AssemblyDescriptionAttribute], $false).Description
         "description=$description" >> $env:GITHUB_OUTPUT
 
