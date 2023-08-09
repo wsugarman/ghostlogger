@@ -112,7 +112,7 @@ runs:
         endpoint: ${{ inputs.codeSigningUri }}
         code-signing-account-name: ${{ inputs.azureCodeSigningAccountName }}
         certificate-profile-name: ${{ inputs.certificateProfileName }}
-        files-folder: "${{ runner.temp }}/build"
+        files-folder: "./src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0"
         files-folder-filter: dll
         file-digest: SHA256
         timestamp-rfc3161: http://timestamp.acs.microsoft.com
