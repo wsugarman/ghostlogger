@@ -15,17 +15,17 @@
   </PropertyGroup>
 
   <!-- Release Tag -->
-  <Choose Condition="'$(ReleaseTag)' == ''">
-    <When Condition="'$(VersionSuffix)' == ''">
+  <Choose>
+    <When Condition="'$(ReleaseTag)' == '' And '$(VersionSuffix)' == ''">
       <PropertyGroup>
         <ReleaseTag>$(VersionPrefix)</ReleaseTag>
       </PropertyGroup>
     </When>
-    <Otherwise>
+    <When Condition="'$(ReleaseTag)' == '' And '$(VersionSuffix)' != ''">
       <PropertyGroup>
         <ReleaseTag>$(VersionPrefix)-$(VersionSuffix)</ReleaseTag>
       </PropertyGroup>
-    </Otherwise>
+    </When>
   </Choose>
 
   <!-- NuGet metadata -->
