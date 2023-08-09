@@ -97,6 +97,11 @@ runs:
       run: |
         "${{ inputs.strongNameExe }}" -Ra "./src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0/Ghostlogger.dll" "${{ runner.temp }}/snk/Private.snk"
 
+    - name: Shutdown
+      shell: bash
+      run: |
+        dotnet build-server shutdown
+
     - name: Code Sign Assembly
       uses: azure/azure-code-signing-action@v0.2.15
       if: ${{ inputs.sign == 'true' && success() }}
