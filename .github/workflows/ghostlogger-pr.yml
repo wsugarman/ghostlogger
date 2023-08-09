@@ -44,3 +44,4 @@ jobs:
           azureCodeSigningAccountName: ${{ secrets.AZURE_CODESIGNING_NAME }}
           strongNameKeySecretName: ${{ secrets.AZURE_KEYVAULT_SECRET_SNK }}
           certificateProfileName: ${{ secrets.AZURE_CODESIGNING_PROFILE_NAME }}
+          repositoryUri: ${{ github.server_url }}/${{ github.repository }}

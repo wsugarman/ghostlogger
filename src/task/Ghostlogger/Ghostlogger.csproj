@@ -1,18 +1,59 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Description>Automatically optimizes .NET logging</Description>
-    <PackageTags>logging</PackageTags>
-    <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix Condition="'$(VersionSuffix)' == ''">alpha.1</VersionSuffix>
-  </PropertyGroup>
-
+  <!-- Guid -->
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.InteropServices.Guid">
       <_Parameter1>d2d06119-e437-4082-bdd6-1f6cf28b65fb</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
+  <!-- Assembly, Build, and Packing Properties -->
+  <PropertyGroup>
+    <Description>Automatically optimizes .NET logging</Description>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(VersionSuffix)' == ''">alpha.1</VersionSuffix>
+  </PropertyGroup>
+
+  <!-- Release Tag -->
+  <Choose Condition="'$(ReleaseTag)' == ''">
+    <When Condition="'$(VersionSuffix)' == ''">
+      <PropertyGroup>
+        <ReleaseTag>$(VersionPrefix)</ReleaseTag>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <ReleaseTag>$(VersionPrefix)-$(VersionSuffix)</ReleaseTag>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <!-- NuGet metadata -->
+  <PropertyGroup>
+    <Authors>William Sugarman</Authors>
+    <PackageIcon>Ghost.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>https://github.com/wsugarman/ghostlogger/releases/tag/$(ReleaseTag)</PackageReleaseNotes>
+    <PackageTags>logging</PackageTags>
+    <MinClientVersion>4.9.0</MinClientVersion>
+  </PropertyGroup>
+
+  <!-- Resource Files -->
+  <ItemGroup>
+    <None Include="$(MSBuildProjectDirectory)\README.md" Pack="true" PackagePath="\" />
+    <None Include="$(ImgDirectory)Ghost.png" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
+  <!-- Dynamic Assembly Info -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(MSBuildProjectName).Test, PublicKey=002400000C800000940000000602000000240000525341310004000001000100E5966C27A1E4CE0F1BFEC0AB7E1E5772A086B8E8AFA2C804708BE10D04500389158056DE28844562BA32494ACF0EE3BFB32E0ECD8ABD5EBC335E1AD9FB624E188735CFF286B278D64822F3DFCE33E2A152423571E57ACF07B0C3E89A75ED52B41326AB989337B93EA6E9F286A1B6BA355E6667465DA5AA0C20515BFF4E5740B8</_Parameter1>
+      <_Parameter1_TypeName>System.String</_Parameter1_TypeName>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <!-- Dependencies -->
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" />

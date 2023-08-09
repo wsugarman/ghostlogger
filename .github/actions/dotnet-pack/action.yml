@@ -52,6 +52,10 @@ inputs:
     default: 'https://wus.codesigning.azure.net/'
     description: The URI of the Azure Code Signing Service.
     required: false
+  repositoryUri:
+    default: 'https://github.com/wsugarman/ghostlogger'
+    description: The URI of the Ghostlogger repository
+    required: false
 
 runs:
   using: composite
@@ -97,6 +101,15 @@ runs:
       run: |
         "${{ inputs.strongNameExe }}" -Ra "./src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0/Ghostlogger.dll" "${{ runner.temp }}/snk/Private.snk"
 
+    - name: Extract Assembly Attributes
+      id: assembly
+      shell: pwsh
+      if: ${{ inputs.sign == 'true' && success() }}
+      run: |
+        $assembly = [System.Reflection.Assembly]::LoadFile('./src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0/Ghostlogger.dll')
+        $description = $assembly.GetCustomAttributes([System.Reflection.AssemblyDescriptionAttribute], $false).Description
+        "description=$description" >> $env:GITHUB_OUTPUT
+
     - name: Shutdown
       shell: bash
       run: |
@@ -117,6 +130,8 @@ runs:
         file-digest: SHA256
         timestamp-rfc3161: http://timestamp.acs.microsoft.com
         timestamp-digest: SHA256
+        description: ${{ steps.assembly.outputs.description }}
+        description-url: ${{ inputs.repositoryUri }}
 
     # TODO: Sign and push package
     - name: Pack
