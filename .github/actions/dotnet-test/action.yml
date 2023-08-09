@@ -1,0 +1,46 @@
+name: dotnet test
+description: Builds the Ghostlogger MSBuild task and runs the tests
+inputs:
+  buildConfiguration:
+    default: Debug
+    description: The dotnet build configuration
+    required: false
+  versionSuffix:
+    default: ''
+    description: The optional assembly and NuGet version suffix
+    required: false
+  resultsDirectory:
+    description: The directory where the test results are going to be placed
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      uses: actions/setup-dotnet@v2
+
+    - name: Build
+      shell: bash
+      run: |
+        dotnet build "./src/Ghostlogger.sln" \
+          -c "${{ inputs.buildConfiguration }}" \
+          "-p:ContinuousIntegrationBuild=true;VersionSuffix=${{ inputs.versionSuffix }}" \
+          -warnaserror
+
+    - name: Test
+      shell: bash
+      run: |
+        dotnet test "./src/Ghostlogger.sln" \
+          -c "${{ inputs.buildConfiguration }}" \
+          "-p:ContinuousIntegrationBuild=true;VersionSuffix=${{ inputs.versionSuffix }}" \
+          -warnaserror \
+          --no-build \
+          --results-directory "${{ inputs.resultsDirectory }}" \
+          --collect "XPlat Code Coverage" \
+          -s "${{ github.workspace }}/src/CodeCoverage.runsettings"
+
+    - name: Upload Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: Tests
+        path: ${{ inputs.resultsDirectory }}

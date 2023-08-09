@@ -4,12 +4,13 @@
   <PropertyGroup>
     <ImgDirectory>$(MSBuildThisFileDirectory)..\img\</ImgDirectory>
     <LangDirectory>$(MSBuildThisFileDirectory)lang\</LangDirectory>
+    <SnkDirectory>$(MSBuildThisFileDirectory)snk\</SnkDirectory>
     <SrcDirectory>$(MSBuildThisFileDirectory)</SrcDirectory>
-    <TaskDirectory>$(MSBuildThisFileDirectory)task\</TaskDirectory>
   </PropertyGroup>
 
   <!-- Common Assembly and Build Properties -->
   <PropertyGroup>
+    <AssemblyOriginatorKeyFile>$(SnkDirectory)Public.snk</AssemblyOriginatorKeyFile>
     <Copyright>Copyright © 2023 William Sugarman.</Copyright>
     <Deterministic>true</Deterministic>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -19,6 +20,7 @@
     <Nullable>enable</Nullable>
     <Product>Ghostlogger</Product>
     <RunSettingsFilePath>$(SrcDirectory)CodeCoverage.runsettings</RunSettingsFilePath>
+    <SignAssembly>true</SignAssembly>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
@@ -30,7 +32,7 @@
       <_Parameter1_TypeName>System.Boolean</_Parameter1_TypeName>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Resources.NeutralResourcesLanguage ">
-      <_Parameter1>en</_Parameter1>
+      <_Parameter1>en-US</_Parameter1>
       <_Parameter1_TypeName>System.String</_Parameter1_TypeName>
     </AssemblyAttribute>
   </ItemGroup>
@@ -64,6 +66,7 @@
         <!-- CA1062: Validate arguments of public methods -->
         <!-- CA1707: Identifiers should not contain underscores -->
         <NoWarn>$(NoWarn);CA1062;CA1707</NoWarn>
+        <PublicSign>true</PublicSign>
         <TargetFrameworks>net7.0</TargetFrameworks>
       </PropertyGroup>
 
@@ -80,40 +83,17 @@
 
       <!-- Assembly, Build, and Packing Properties -->
       <PropertyGroup>
+        <DelaySign>true</DelaySign>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeSymbols>true</IncludeSymbols>
         <!-- NU5105: Package version contains components that may not be supported on NuGet clients older than v4.3 -->
         <NoWarn>$(NoWarn);NU5105</NoWarn>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <SkipDefaultEditorConfigAsAdditionalFile>true</SkipDefaultEditorConfigAsAdditionalFile>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
       </PropertyGroup>
-
-      <!-- NuGet metadata -->
-      <PropertyGroup>
-        <Authors>William Sugarman</Authors>
-        <PackageIcon>Ghost.png</PackageIcon>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReleaseNotes>https://github.com/wsugarman/ghostlogger/releases/tag/$(PackageVersion)</PackageReleaseNotes>
-        <MinClientVersion>4.9.0</MinClientVersion>
-      </PropertyGroup>
-
-      <!-- Resource Files -->
-      <ItemGroup>
-        <None Include="$(MSBuildProjectDirectory)\README.md" Pack="true" PackagePath="\" />
-        <None Include="$(ImgDirectory)Ghost.png" Pack="true" PackagePath="\" Visible="false" />
-      </ItemGroup>
-
-      <!-- Dynamic Assembly Info -->
-      <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-          <_Parameter1>$(MSBuildProjectName).Test</_Parameter1>
-          <_Parameter1_TypeName>System.String</_Parameter1_TypeName>
-        </AssemblyAttribute>
-      </ItemGroup>
 
     </Otherwise>
   </Choose>

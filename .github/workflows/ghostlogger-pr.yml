@@ -1,0 +1,37 @@
+name: Ghostlogger PR
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Test
+        uses: ./.github/actions/dotnet-test
+        with:
+          buildConfiguration: Debug
+          versionSuffix: pr.${{ github.event.pull_request.number }}
+          resultsDirectory: ${{ runner.temp }}/TestResults/
+
+  package:
+    name: Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Package
+        uses: ./.github/actions/dotnet-pack
+        with:
+          buildConfiguration: Release
+          versionSuffix: pr.${{ github.event.pull_request.number }}
