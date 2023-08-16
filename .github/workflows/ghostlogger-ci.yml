@@ -26,6 +26,9 @@ jobs:
     needs: test
     runs-on: windows-latest
 
+    permissions:
+      id-token: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -37,7 +40,6 @@ jobs:
           sign: 'true'
           azureTenantId: ${{ secrets.AZURE_TENANT_ID }}
           azureClientId: ${{ secrets.AZURE_CLIENT_ID }}
-          azureClientSecret: ${{ secrets.AZURE_CLIENT_SECRET }}
           azureSubscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           azureKeyVaultName: ${{ secrets.AZURE_KEYVAULT_NAME }}
           azureCodeSigningAccountName: ${{ secrets.AZURE_CODESIGNING_NAME }}
