@@ -66,24 +66,26 @@ runs:
         global-json-file: 'global.json'
         dotnet-version: '6.x'
 
-    - name: az login
+    - if: ${{ inputs.sign == 'true' && success() }}
+      name: az login
       uses: azure/login@v1
-      if: ${{ inputs.sign == 'true' && success() }}
       with:
-        creds: '{"clientId":"${{ inputs.azureClientId }}","clientSecret":"${{ inputs.azureClientSecret }}","subscriptionId":"${{ inputs.azureSubscriptionId }}","tenantId":"${{ inputs.azureTenantId }}"}'
+        client-id: ${{ inputs.azureClientId }}
+        tenant-id: ${{ inputs.azureTenantId }}
+        subscription-id: ${{ inputs.azureSubscriptionId }}
 
-    - name: Fetch Strong Name Key Secret
+    - if: ${{ inputs.sign == 'true' && success() }}
+      name: Fetch Strong Name Key Secret
       id: akv
       shell: bash
-      if: ${{ inputs.sign == 'true' && success() }}
       run: |
         key=$(az keyvault secret show -n "${{ inputs.strongNameKeySecretName }}" --vault-name "${{ inputs.azureKeyVaultName }}" --query value -o tsv)
         echo "::add-mask::$key"
         echo "snk=$key" >> "$GITHUB_OUTPUT"
 
-    - name: Create .snk File
+    - if: ${{ inputs.sign == 'true' && success() }}
+      name: Create .snk File
       shell: bash
-      if: ${{ inputs.sign == 'true' && success() }}
       run: |
         mkdir -p "${{ runner.temp }}/snk/"
         echo $STRONG_NAME_KEY_BASE64 | base64 --decode > "${{ runner.temp }}/snk/Private.snk"
@@ -98,43 +100,37 @@ runs:
           "-p:ContinuousIntegrationBuild=true;VersionSuffix=${{ inputs.versionSuffix }}" \
           -warnaserror
 
-    - name: Sign with Enhanced Strong Name
+    - if: ${{ inputs.sign == 'true' && success() }}
+      name: Sign with Enhanced Strong Name
       shell: bash
-      if: ${{ inputs.sign == 'true' && success() }}
       run: |
         "${{ inputs.strongNameExe }}" -Ra "./src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0/Ghostlogger.dll" "${{ runner.temp }}/snk/Private.snk"
 
-    - name: Extract Assembly Attributes
+    - if: ${{ inputs.sign == 'true' && success() }}
+      name: Extract Assembly Attributes
       id: assembly
       shell: pwsh
-      if: ${{ inputs.sign == 'true' && success() }}
       run: |
         $assembly = [System.Reflection.Assembly]::LoadFile('${{ github.workspace }}/src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0/Ghostlogger.dll')
         $description = $assembly.GetCustomAttributes([System.Reflection.AssemblyDescriptionAttribute], $false).Description
         "description=$description" >> $env:GITHUB_OUTPUT
 
-    - name: Shutdown
-      shell: bash
+    - if: ${{ inputs.sign == 'true' && success() }}
+      name: Code Sign Assembly
+      shell: pwsh
       run: |
-        dotnet build-server shutdown
-
-    - name: Code Sign Assembly
-      uses: azure/azure-code-signing-action@v0.2.20
-      if: ${{ inputs.sign == 'true' && success() }}
-      with:
-        azure-tenant-id: ${{ inputs.azureTenantId }}
-        azure-client-id: ${{ inputs.azureClientId }}
-        azure-client-secret: ${{ inputs.azureClientSecret }}
-        endpoint: ${{ inputs.codeSigningUri }}
-        code-signing-account-name: ${{ inputs.azureCodeSigningAccountName }}
-        certificate-profile-name: ${{ inputs.certificateProfileName }}
-        files-folder: "./src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0"
-        files-folder-filter: dll
-        file-digest: SHA256
-        timestamp-rfc3161: http://timestamp.acs.microsoft.com
-        timestamp-digest: SHA256
-        description: ${{ steps.assembly.outputs.description }}
-        description-url: ${{ inputs.repositoryUri }}
+        Install-Module -Name AzureCodeSigning -RequiredVersion 0.2.21 -Force -Repository PSGallery
+        Invoke-AzureCodeSigning `
+          -Endpoint '${{ inputs.codeSigningUri }}' `
+          -CodeSigningAccountName '${{ inputs.azureCodeSigningAccountName }}' `
+          -CertificateProfileName '${{ inputs.certificateProfileName }}' `
+          -FilesFolder './src/task/Ghostlogger/bin/${{ inputs.buildConfiguration }}/netstandard2.0' `
+          -FilesFolderFilter 'dll' `
+          -FileDigest 'SHA256' `
+          -TimestampRfc3161 'http://timestamp.acs.microsoft.com' `
+          -TimestampDigest 'SHA256' `
+          -Description '${{ steps.assembly.outputs.description }}' `
+          -DescriptionUrl '${{ inputs.repositoryUri }}'
 
     # TODO: Sign and push package
     - name: Pack
@@ -152,15 +148,15 @@ runs:
         name: Package
         path: ${{ runner.temp }}/package
 
-    - name: Delete .snk File
+    - if: ${{ inputs.sign == 'true' && always() }}
+      name: Delete .snk File
       shell: bash
-      if: ${{ inputs.sign == 'true' && always() }}
       run: |
         rm -f "${{ runner.temp }}/snk/Private.snk"
 
-    - name: az logout
+    - if: ${{ inputs.sign == 'true' && always() }}
+      name: az logout
       shell: bash
-      if: ${{ inputs.sign == 'true' && always() }}
       run: |
         az logout
         az cache purge
