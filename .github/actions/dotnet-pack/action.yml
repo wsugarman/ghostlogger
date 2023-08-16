@@ -21,10 +21,6 @@ inputs:
     default: ''
     description: The client ID for the service principal used to access the Azure Key Vault and Azure Code Signing Service.
     required: false
-  azureClientSecret:
-    default: ''
-    description: The client secret for the service principal used to access the Azure Key Vault and Azure Code Signing Service.
-    required: false
   azureSubscriptionId:
     default: ''
     description: The Azure subscription ID containing both the Azure Key Vault and Azure Code Signing Service.
