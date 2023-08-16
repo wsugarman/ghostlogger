@@ -126,7 +126,15 @@ runs:
           -TimestampRfc3161 'http://timestamp.acs.microsoft.com' `
           -TimestampDigest 'SHA256' `
           -Description '${{ steps.assembly.outputs.description }}' `
-          -DescriptionUrl '${{ inputs.repositoryUri }}'
+          -DescriptionUrl '${{ inputs.repositoryUri }}' `
+          -ExcludeEnvironmentCredential $True `
+          -ExcludeManagedIdentityCredential $True `
+          -ExcludeSharedTokenCacheCredential $True `
+          -ExcludeVisualStudioCredential $True `
+          -ExcludeVisualStudioCodeCredential $True `
+          -ExcludeInteractiveBrowserCredential $True `
+          -ExcludeAzurePowerShellCredential $True `
+          -ExcludeAzureCliCredential $False
 
     # TODO: Sign and push package
     - name: Pack
