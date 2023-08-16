@@ -24,10 +24,7 @@ jobs:
 
   package:
     name: Package
-    runs-on: windows-latest
-
-    permissions:
-      id-token: write
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -38,12 +35,3 @@ jobs:
         with:
           buildConfiguration: Release
           versionSuffix: pr.${{ github.event.pull_request.number }}
-          sign: 'true'
-          azureTenantId: ${{ secrets.AZURE_TENANT_ID }}
-          azureClientId: ${{ secrets.AZURE_CLIENT_ID }}
-          azureSubscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          azureKeyVaultName: ${{ secrets.AZURE_KEYVAULT_NAME }}
-          azureCodeSigningAccountName: ${{ secrets.AZURE_CODESIGNING_NAME }}
-          strongNameKeySecretName: ${{ secrets.AZURE_KEYVAULT_SECRET_SNK }}
-          certificateProfileName: ${{ secrets.AZURE_CODESIGNING_PROFILE_NAME }}
-          repositoryUri: ${{ github.server_url }}/${{ github.repository }}
