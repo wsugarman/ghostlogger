@@ -139,7 +139,7 @@ runs:
           -o "${{ runner.temp }}/package"
 
     - name: Upload NuGet Package
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Package
         path: ${{ runner.temp }}/package
